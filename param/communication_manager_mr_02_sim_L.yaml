@@ -1,0 +1,202 @@
+#################################################################################################
+# File              : communication_manager_mr_02_sim_L.yaml
+# Last Update Date  : 2023/12/12
+# Author            : S.Kumada
+#################################################################################################
+# Change history 
+# DATE        Author     Description
+# 2023/09/19  S.Kuamda   新規作成
+# 2023/09/20  S.Kuamda   TFフレーム名の追加
+# 2023/09/26  S.Kuamda   MQTTにて送信するトピックに関して、項目ごとに階層分けて整理
+# 2023/09/26  S.Kuamda   緊急停止指示及び指示応答の設定値を追加
+# 2023/09/27  S.Kuamda   空間情報の設定値を追加
+# 2023/10/06  S.Kuamda   準静的物体の位置情報取得関係のパラメータ追加
+# 2023/12/12  S.Kuamda   位置取得時の機体名を指定する機能の追加
+##################################################################################################
+
+# ロボット名
+robot_id: megarover_02_sim
+
+# ロボットの種別
+robot_type: megarover
+
+# ロボット機種名
+robot_name: Megarover
+
+# 空間情報
+space_info: virtual
+
+# TFのトップ階層(使用する場合のみ)
+tf_prefix: megarover_02_sim # 実機ロボットのグローバルフレーム名はmapのまま変更しない
+
+# 地図のTFフレーム名(使用する場合のみ)
+# map_frame_id: map # 実機ロボットのグローバルフレーム名はmapのまま変更しない
+
+# 地図の場所情報
+map_location: lictia_1f
+
+# エゴ地図のトピック名
+ego_map_topic: map
+
+# ソシオ地図のトピック名
+socio_map_topic: map_movebase
+
+# リトライ時間（sec）
+retry_interval_time: 5
+
+# 最大リトライ回数
+max_num_of_retry: 5
+
+# ループ頻度
+loop_rate: 30
+
+# MQTT関連設定
+## To MQTTブリッジ
+### ロボットのステータス情報
+robot_state: 
+    for_robot_topic_name: /robot_bridge/megarover_02_sim/state    # Robot内部からの配信トピック名
+    to_bridge_topic_name: /ros_bridge/mqtt/pub/robot_state   # MQTTブリッジへの配信トピック名
+    publish_rate: 0     # 配信レート(0は無制限)[Hz]
+
+### 経路
+path_plan:
+    for_robot_topic_name: /move_base/NavfnROS/plan    # Robot内部からの配信トピック名
+    to_bridge_topic_name: /ros_bridge/mqtt/pub/local_path_plan   # MQTTブリッジへの配信トピック名
+    publish_rate: 0     # 配信レート(0は無制限)[Hz]
+
+### LiDAR2D点群
+lidar_2d:
+    for_robot_topic_name: /scan    # Robot内部からの配信トピック名
+    to_bridge_topic_name: /ros_bridge/mqtt/pub/laserscan   # MQTTブリッジへの配信トピック名
+    publish_rate: 1     # 配信レート(0は無制限)[Hz]
+
+### LiDAR3D点群
+lidar_3d:
+    for_robot_topic_name: /velodyne_points    # Robot内部からの配信トピック名
+    to_bridge_topic_name: /ros_bridge/mqtt/pub/pointcloud   # MQTTブリッジへの配信トピック名
+    publish_rate: 1     # 配信レート(0は無制限)[Hz]
+
+### 緊急停止指示応答
+emg_cmd_exe:
+    for_robot_topic_name: /robot_bridge/megarover_02_sim/emgexe    # Robot内部からの配信トピック名
+    to_bridge_topic_name: /ros_bridge/mqtt/pub/emg_exe   # MQTTブリッジへの配信トピック名
+    publish_rate: 0     # 配信レート(0は無制限)[Hz]
+
+## To ロボット
+### 緊急停止指示
+emg_cmd: 
+    for_bridge_topic_name: /ros_bridge/mqtt/sub/emg # MQTTブリッジからのレスポンストピック名
+    to_robot_topic_name: /robot_bridge/megarover_02_sim/emg    # ロボット内部へのレスポンストピック名
+    publish_rate: 0     # 配信レート(0は無制限)[Hz]
+
+### 地図の更新通知
+map_update_notify:
+    for_bridge_topic_name: /ros_bridge/mqtt/sub/map_update_notify" # MQTTブリッジからのレスポンストピック名
+    # to_robot_topic_name:     # ロボット内部へのレスポンストピック名
+    # publish_rate: 0     # 配信レート(0は無制限)[Hz]
+
+
+# HTTP関連設定
+## ロボット内部の地図トピック名
+map_topic:
+    ego_map_topic_name: /map
+    sosio_map_topic_name: /map_movebase
+    static_map_topic_name: /static_layer_map
+    quasi_static_map_topic_name: /quasi_static_layer_map
+    no_entry_map_topic_name: /no_entry_layer_map
+    environment_map_topic_name: /environment_map
+    reference_map_topic_name: /reference_map
+
+## 位置取得時の機体名
+get_robot_position_name: megarover_02
+
+## 地図の補正値
+map_pose_correct_topic: /correction_info
+
+## 手動セッティング関係（使用しない場合はコメントアウト）
+# manual_settings:
+#     put_map_linked_revision: "6auq-pfko-a7bu-mtxz-11" ## 配信する地図の紐づく環境地図のリビジョン番号
+#     put_correct_val_linked_target_map_revision: "6auq-pfko-a7bu-mtxz-11" ## 配信する補正値の紐づく地図(ターゲット)のリビジョン番号
+#     put_correct_val_linked_source_map_revision: "6auq-pfko-a7bu-mtxz-11" ## 配信する補正値の紐づく地図(ソース)のリビジョン番号
+
+## ロボットの機体情報
+robot_info: 
+    for_robot_topic_name: /robot_bridge/robo_info    # Robot内部からのリクエストトピック名
+    to_bridge_topic_name:  /ros_bridge/http/req/robot_info   # HTTPブリッジへのリクエストトピック名
+    for_bridge_topic_name: /ros_bridge/http/res/robot_info # HTTPブリッジからのレスポンストピック名
+    # to_robot_topic_name:    # ロボット内部へのレスポンストピック名
+    max_num_of_retry: 5
+    retry_interval_time: 5
+# pub_req_robot_info_topic_name:  
+
+## 自己位置・局所経路探用地図情報一覧(最大10件)を取得
+get_map_data_list:
+    for_robot_topic_name: /robot_bridge/map_data_list
+    to_bridge_topic_name: /ros_bridge/http/req/map_data_list
+    for_bridge_topic_name: /ros_bridge/http/res/map_data_list
+    # to_robot_topic_name: 
+    max_num_of_retry: 5
+    retry_interval_time: 5
+
+## 地図をRDRへ配信する
+put_map_data:
+    for_robot_topic_name: /simulator_bridge/put_map_data
+    to_bridge_topic_name: /ros_bridge/http/req/put_map_data
+    for_bridge_topic_name: /ros_bridge/http/res/put_map_data
+    # to_robot_topic_name:
+    max_num_of_retry: 5
+    retry_interval_time: 5
+
+## 地図1件の取得
+get_map_data:
+    for_robot_topic_name: /robot_bridge/get_map_data
+    to_bridge_topic_name: /ros_bridge/http/req/get_map_data 
+    for_bridge_topic_name: /ros_bridge/http/res/get_map_data
+    # to_robot_topic_name:
+    max_num_of_retry: 5
+    retry_interval_time: 5
+
+## 環境地図に紐づくレイヤー地図1件の取得
+get_layer_map_data:
+    for_robot_topic_name: /robot_bridge/get_layer_map_data
+    to_bridge_topic_name: /ros_bridge/http/req/get_layer_map_data
+    for_bridge_topic_name: /ros_bridge/http/res/get_layer_map_data
+    # to_robot_topic_name:
+    max_num_of_retry: 5
+    retry_interval_time: 5 
+
+## 物体認識システムで認識したロボットの推定位置の取得
+get_cam_position_data:
+    for_robot_topic_name: /robot_bridge/get_position_data
+    to_bridge_topic_name: /ros_bridge/http/req/get_position_data
+    for_bridge_topic_name: /ros_bridge/http/res/get_position_data
+    to_robot_topic_name: /initialpose
+    max_num_of_retry: 5
+    retry_interval_time: 5
+
+## 地図の補正値情報の配信
+put_correct_info:
+    for_robot_topic_name: /robot_bridge/put_correction_value
+    to_bridge_topic_name: /ros_bridge/http/req/put_correction_value
+    for_bridge_topic_name: /ros_bridge/http/res/put_correction_value
+    # to_robot_topic_name: 
+    max_num_of_retry: 5
+    retry_interval_time: 5
+
+## 地図の補正値情報の取得
+get_correct_info:
+    for_robot_topic_name: /robot_bridge/get_correction_value
+    to_bridge_topic_name: /ros_bridge/http/req/get_correction_value
+    for_bridge_topic_name: /ros_bridge/http/res/get_correction_value
+    to_robot_topic_name: /robot_bridge/correction_value
+    max_num_of_retry: 5
+    retry_interval_time: 5
+
+## 準静的物体の位置情報の取得
+get_object_location:
+    for_robot_topic_name: /simulator_bridge/get_object_location
+    to_bridge_topic_name: /ros_bridge/http/req/get_object_location
+    for_bridge_topic_name: /ros_bridge/http/res/get_object_location
+    to_robot_topic_name: /simulator_bridge/object_location
+    max_num_of_retry: 5
+    retry_interval_time: 5

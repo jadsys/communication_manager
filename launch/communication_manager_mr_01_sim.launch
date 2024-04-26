@@ -1,0 +1,10 @@
+<launch>
+  <arg name="ENTITY_ID" default="megarover_01_sim" />
+
+  <group ns="$(arg ENTITY_ID)">
+    <node pkg="communication_manager" type="communication_manager_node" name="communication_manager_node" output="screen" >
+      <rosparam file="$(find communication_manager)/param/communication_manager_mr_01_sim_L.yaml" command="load" />
+    </node>
+  </group>
+
+</launch>
